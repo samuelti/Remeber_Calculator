@@ -15,7 +15,11 @@ Calculations.init(
     calc_content: {
       type: DataTypes.STRING,
       allowNull: false
-    }
+    },
+    calc_called:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     sequelize,
