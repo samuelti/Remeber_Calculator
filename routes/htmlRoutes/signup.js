@@ -13,7 +13,7 @@ router.post("/signUp", (req, res) => {
 
     res.redirect('/')
 
-  });
+  }).catch(err => res.status(oops) )
 
 });
 router.get("/signUp", (req, res) => {
