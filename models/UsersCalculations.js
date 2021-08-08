@@ -14,6 +14,7 @@ UsersCalculations.init(
     },
     user_id:{
       type: DataTypes.INTEGER, 
+      unique: 'compositeindex',
       refrences:{
         model: 'users',
         key: 'id'
@@ -21,6 +22,7 @@ UsersCalculations.init(
     },
     calculation_id:{
       type: DataTypes.INTEGER, 
+      unique: 'compositeindex',
       refrences:{
         model: 'calculations',
         key: 'id'
