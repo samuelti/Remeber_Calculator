@@ -24,4 +24,4 @@ router.post('/', (req, res) => {
       });
   });
 
-modules.exports = router;
+module.exports = router;

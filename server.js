@@ -36,6 +36,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+var publicPath = path.join(__dirname, 'public');
+console.log('\nPublic Path', publicPath);
+
 app.use(require('./routes'));
 
 
