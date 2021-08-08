@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 router.post('/', (req, res) => {
     
-    Product.create(req.body)
+    Calculations.create(req.body)
       .then((product) => {
     
         if (req.body.tagIds.length) {
@@ -24,8 +24,4 @@ router.post('/', (req, res) => {
       });
   });
 
-  router.get("/calculator", (req, res) => {
-    res.render('calculator')
-  });
-  
-  module.exports = router;
+modules.exports = router;

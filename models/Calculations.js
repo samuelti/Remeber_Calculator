@@ -14,7 +14,8 @@ Calculations.init(
     },
     calc_content: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true,
     },
     calc_called:{
       type: DataTypes.INTEGER,

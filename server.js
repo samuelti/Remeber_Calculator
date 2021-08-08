@@ -11,17 +11,21 @@ const sequelize = require('./config/config');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+var myStore = new SequelizeStore({
+  db: sequelize,
+});
+
 const sess = {
   secret: 'Super secret secret',
   cookie: {},
   resave: false,
   saveUninitialized: true,
-  store: new SequelizeStore({
-    db: sequelize,
-  }),
+  store: myStore,
 };
 
 app.use(session(sess));
+
+myStore.sync();
 
 //const hbs = exphbs.create({ helpers });
 const hbs = exphbs.create();

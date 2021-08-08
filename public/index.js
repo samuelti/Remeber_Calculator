@@ -1,7 +1,14 @@
-function calculator(fn){
-    return new Function('return'+ fn)()
-  };
+function calculation(fn) {
+  return new Function('return ' + fn)();
+}
 
-  const calcInput = document.getElementById('calcInput').value
-  
-  //evil(calcInput)
+function start(e) {
+  e.preventDefault();
+  console.log('e is:', e);
+
+  var calcInput = document.getElementById('calc').value;
+
+  return console.log(calculation(calcInput));
+}
+
+document.getElementById('btn').onclick = start;
