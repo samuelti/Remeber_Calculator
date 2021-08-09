@@ -3,32 +3,83 @@ const Calculations = require('../../models/Calculations.js');
 const UsersCalculations = require('../../models/UsersCalculations.js');
 const router = require('express').Router();
 
-function handleCalcExists(req,res) {
+function incrementCalled(req, res) {
+    Calculations.increment(
+        {
+            calc_called: +1,
+        },
+        {
+            where: {
+                calc_content: req.body.calc_content,
+            }
+        }
+    ).then((incrementresult) => {
+        console.log(incrementresult);
+        return 200;
+    }).catch(err => {
+        console.log('\nerror', err.errors)
+        return 500;
+    });
+}
+
+function handleCalcExists(req, res) {
 
     Calculations.findOne({
         where: {
             calc_content: req.body.calc_content,
         },
     }).then((findResult) => {
-        console.log(findResult)
+        console.log(findResult);
         const newUsersCalc = {
-            calculation_id:findResult.dataValues.id,
+            calculation_id: findResult.dataValues.id,
             user_id: req.session.userId,
         };
         UsersCalculations.create(newUsersCalc)
-        .then((createUserCalcResult) => {
-            console.log(createUserCalcResult)
-            res.status(200)
-        }).catch(err => {
-            console.log('\nerror', err.errors)
-            res.status(500)
-          });
-        res.status(200)
+            .then((createUserCalcResult) => {
+                console.log(createUserCalcResult)
+            }).catch(err => {
+                console.log('\nerror', err.errors)
+            });
+        if (incrementCalled(req, res) == 200) {
+            return findResult.dataValues.id;
+        }
+        else {
+            return -1;
+        }
     }).catch(err => {
-        console.log('find error', err)
-        res.status(500)
+        console.log('find error', err);
+        return -1;
     });
 };
+
+function createUserCalc(req, res, calcId) {
+    const newUsersCalc = {
+        calculation_id: calcId,
+        user_id: req.session.userId,
+    };
+    UsersCalculations.create(newUsersCalc)
+        .then((createUserCalcResult) => {
+            console.log(createUserCalcResult);
+            return 200;
+        }).catch(err => {
+            console.log('\nerror', err.errors);
+            var uniqueViolation = false;
+            err.errors.map(x => {
+                if (x.type == 'unique violation') {
+                    uniqueViolation = true;
+                }
+                console.log('error item', x.type);
+            });
+            if (uniqueViolation) {
+                console.log('yay :DDDDD');
+                return 200;
+            }
+            else {
+                console.log('didn\'t work DDDDDDD:');
+                return 500;
+            }
+        });
+}
 
 router.post('/calcUpdate', (req, res) => {
     console.log('req.body', req.body);
@@ -37,60 +88,45 @@ router.post('/calcUpdate', (req, res) => {
         calc_called: 1
     }
     Calculations.create(newCalc)
-    .then((createResult) => {
-        console.log('createResult',createResult)
-        const newUsersCalc = {
-            calculation_id:createResult.dataValues.id,
-            user_id: req.session.userId,
-        };
-        UsersCalculations.create(newUsersCalc)
-        .then((createUserCalcResult) => {
-            console.log(createUserCalcResult)
-            res.status(200)
+        .then((createResult) => {
+            console.log('createResult', createResult)
+            
+            res.status(createUserCalc(req, res,createResult.dataValues.id))
         }).catch(err => {
             console.log('\nerror', err.errors)
-            res.status(500)
-          });
-        res.status(200)
-    }).catch(err => {
-        console.log('\nerror', err.errors)
-        var uniqueViolation = false;
-        err.errors.map(x=> {
-            if (x.type == 'unique violation') {
-                uniqueViolation = true;
-            }    
-            console.log('error item', x.type)
+            var uniqueViolation = false;
+            err.errors.map(x => {
+                if (x.type == 'unique violation') {
+                    uniqueViolation = true;
+                }
+                console.log('error item', x.type)
+            });
+            if (uniqueViolation) {
+                console.log('yay :DDDDD')
+                var calcId = handleCalcExists(req, res);
+                if (calcId > 0)
+                {
+                    res.status(createUserCalc(req, res, calcId));
+                }
+                else {
+                    res.status(500);
+                }
+                /*
+                var status = createUserCalc(req, res);
+                if (status == 200) {
+                    res.status(handleCalcExists(req, res))
+                }
+                else {
+                    res.status(status)
+                }
+                */
+            }
+            else {
+                console.log('didn\'t work DDDDDDD:')
+                res.status(500)
+            }
         });
-        if(uniqueViolation){
-          console.log('yay :DDDDD')
-          handleCalcExists(req,res)
-          res.status(200)
-        }
-        else{
-          console.log('didn\'t work DDDDDDD:')
-          res.status(500)
-        }
-      });
-    // Calculations.create(req.body)
-    //   .then((product) => {
-    
-    //     if (req.body.tagIds.length) {
-    //       const productTagIdArr = req.body.tagIds.map((tag_id) => {
-    //         return {
-    //           product_id: product.id,
-    //           tag_id,
-    //         };
-    //       });
-    //       return ProductTag.bulkCreate(productTagIdArr);
-    //     }
-    //     res.status(200).json(product);
-    //   })
-    //   .then((productTagIds) => res.status(200).json(productTagIds))
-    //   .catch((err) => {
-    //     console.log(err);
-    //     res.status(400).json(err);
-    //   });
 
-  });
+});
 
 module.exports = router;
