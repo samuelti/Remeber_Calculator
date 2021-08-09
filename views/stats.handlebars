@@ -1,0 +1,9 @@
+<table border="1">
+    <tr><th>Number of Times Executed</th><th>Operation</th></tr>
+    {{#each calculation}}
+    <tr>
+        <td>{{this.calc_called}}</td>
+        <td>{{this.calc_content}}</td>
+    </tr>
+    {{/each}}
+</table>
